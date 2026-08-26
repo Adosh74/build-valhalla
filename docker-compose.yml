@@ -1,0 +1,22 @@
+services:
+  valhalla:
+    image: ghcr.io/gis-ops/docker-valhalla/valhalla:latest
+    container_name: valhalla
+    restart: always
+    ports:
+      - "8002:8002"
+    environment:
+      serve_tiles: "True"
+      build_admins: "True"
+      build_elevation: "False"
+      build_time_zones: "False"
+      use_tiles_ignore_pbf: "False"
+      force_rebuild: "False"
+    volumes:
+      - ${VALHALLA_DATA:-./valhalla/custom_files}:/custom_files
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8002/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40m
